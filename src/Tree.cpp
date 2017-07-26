@@ -44,7 +44,7 @@ Tree::Tree(coordinate _size, coordinate*** sources, square_color _number_of_colo
 	}
 		
 	
-	Node* * newnodes = new Node*[number_of_colors * 4]();
+	newnodes = new Node*[number_of_colors * 4]();
 	printf("%p\n", newnodes);
 	
 }
