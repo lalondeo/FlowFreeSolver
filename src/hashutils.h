@@ -20,7 +20,6 @@ private:
 	square_color number_of_colors;
 	
 	uint64_t ** positionhashkeys; // size x size
-	uint64_t *** tempsourceshashkeys; //number_of_colors x size x size
 	
 };
 

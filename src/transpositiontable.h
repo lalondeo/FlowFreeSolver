@@ -10,6 +10,8 @@
  Thanks to my bff kz04px OuO and the code he wrote for Monochrome at https://github.com/CPirc/Monochrome/blob/master/tt.cpp
 */
 
+#define STRONGISOMETRY
+
 struct Position
 {
 	uint64_t hash;
@@ -24,8 +26,7 @@ public:
 	
 	bool positionwasseenbefore(square_color ** grid, Node* * tempsources);
 	void inputnode(Node * node);
-	uint64_t gettempindex();
-	void deleteindex(uint64_t index);
+
 	
 //private:
 	Position* * positions;

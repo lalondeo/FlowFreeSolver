@@ -11,7 +11,7 @@ using namespace std;
 class Node
 {
 public:
-	Node(square_color _color, coordinate _x, coordinate _y, Node*, bool _isfirstchild = false, bool iscomplete = false);
+	Node(square_color _color, coordinate _x, coordinate _y, Node* _predecessor, Node* _lastnodeinpipe, bool _isfirstchild = false, bool _isendsource = false);
 	~Node();
 	
 	square_color getColor();
@@ -20,6 +20,7 @@ public:
 	coordinate x;
 	coordinate y;
 	bool isfirstchild;
+	bool isendsource;
 	
 	int eval;
 	coordinate_squared depth;

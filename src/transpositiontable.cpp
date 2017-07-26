@@ -36,8 +36,12 @@ bool TranspositionTable::positionwasseenbefore(square_color ** grid, Node* * tem
 	if(correspondingposition != NULL &&  correspondingposition->hash == temphash)
 	{
 		applynodetogrid(correspondingposition->node, positiongrid);
-		computetempsources(correspondingposition->node, positiontempsources, number_of_colors);
-		wasseenbefore = (gridsareisometric(grid) && tempsourcesareidentical(tempsources));
+		if(gridsareisometric(grid))
+		{
+			computetempsources(correspondingposition->node, positiontempsources, number_of_colors);
+			wasseenbefore = tempsourcesareidentical(tempsources);
+		}
+
 		resetgrid(correspondingposition->node, positiongrid);
 	}
 
@@ -64,7 +68,13 @@ bool TranspositionTable::gridsareisometric(square_color ** grid)
 	bool isisometric = true;
 	for(int i = 0; i < size && isisometric; i++)
 		for(int j = 0; j < size && isisometric; j++)
+		{
+			#ifdef STRONGISOMETRY
+			isisometric = (grid[i][j] == positiongrid[i][j]);
+			#else
 			isisometric = !((grid[i][j] == 0) ^ (positiongrid[i][j] == 0));
+			#endif
+		}
 		
 	return isisometric;
 }
@@ -78,16 +88,3 @@ bool TranspositionTable::tempsourcesareidentical(Node* * tempsources)
 	return areidentical;
 }
 
-uint64_t TranspositionTable::gettempindex()
-{
-	return tempindex;
-}
-
-void TranspositionTable::deleteindex(uint64_t index)
-{
-	assert(index >= 0);
-	assert(index < numberofpositions);
-	
-	delete positions[index];
-	positions[index] = NULL;
-}

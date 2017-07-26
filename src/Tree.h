@@ -11,8 +11,9 @@
 #include <algorithm>
 #include "transpositiontable.h"
 #include <cassert>
+#include "eval.h"
 
-#define MAX_NUMBER_OF_SOLVED_NODES 10
+#define MAX_NUMBER_OF_SOLVED_NODES 1000
 
 class Tree
 {
@@ -41,6 +42,8 @@ private:
 	
 	Node * solved_nodes[MAX_NUMBER_OF_SOLVED_NODES];
 	int isolvednodes;
+	
+	NodeEval * nodeeval;
 	
 	
 	

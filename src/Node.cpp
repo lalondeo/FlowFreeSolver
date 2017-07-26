@@ -1,31 +1,16 @@
 #include "Node.h"
 #include <assert.h>
 
-Node::Node(square_color _color, coordinate _x, coordinate _y, Node * _predecessor, bool _isfirstchild, bool iscomplete) : 
-			color(_color), x(_x), y(_y), predecessor(_predecessor), isfirstchild(_isfirstchild)
+Node::Node(square_color _color, coordinate _x, coordinate _y, Node * _predecessor, Node * _lastnodeinpipe, bool _isfirstchild, bool _isendsource) : 
+			color(_color), x(_x), y(_y), predecessor(_predecessor), lastnodeinpipe(_lastnodeinpipe), isfirstchild(_isfirstchild), isendsource(_isendsource)
 {
 	assert(color > 0);
 	eval = 0;
-	lastnodeinpipe = predecessor;
-	while(lastnodeinpipe != NULL && lastnodeinpipe->color!= color)
-		lastnodeinpipe = lastnodeinpipe->predecessor;
+
 	
 	pipelength = ((lastnodeinpipe != NULL) ? lastnodeinpipe->pipelength + 1 : 0);
 	depth = ((predecessor != NULL) ? predecessor->depth + 1 : 0);
-	if(iscomplete) eval = EVAL_SOLVED;
-	
-	else
-	{
-		if(lastnodeinpipe != NULL && lastnodeinpipe->lastnodeinpipe != NULL)
-		{
-			eval = lastnodeinpipe->eval;
-			if(abs(x - lastnodeinpipe->lastnodeinpipe->x) == 2 || abs(y - lastnodeinpipe->lastnodeinpipe->y) == 2)
-				eval += 1;
-			
-			eval = min(EVAL_NORMALMAX, eval); 
-		}
-		
-	}
+
 		
 }
 
@@ -70,6 +55,7 @@ void resetgrid(Node * node, square_color** grid)
 {
 	while(node != NULL)
 	{
+
 		grid[node->y][node->x] = 0;
 		node = node->predecessor;
 	}

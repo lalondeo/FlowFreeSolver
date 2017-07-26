@@ -2,6 +2,8 @@
 
 Tree::Tree(coordinate _size, coordinate*** sources, square_color _number_of_colors) : size(_size), number_of_colors(_number_of_colors)
 {
+
+	
 	uint64_t numberofpositions = size;
 	for(int i = 0; i < 7; i++) numberofpositions *= size;
 	
@@ -15,7 +17,7 @@ Tree::Tree(coordinate _size, coordinate*** sources, square_color _number_of_colo
 	analysisgrid = generateEmptyGrid(size);
 	
 	endsources = new coordinate*[number_of_colors];
-	Node * firstnode = new Node(1,  sources[0][0][0], sources[0][0][1], NULL, false);
+	Node * firstnode = new Node(1,  sources[0][0][0], sources[0][0][1], NULL, NULL, false);
 	endsources[0] = new coordinate[2];
 	endsources[0][0] = sources[0][1][0];
 	endsources[0][1] = sources[0][1][1];
@@ -24,7 +26,7 @@ Tree::Tree(coordinate _size, coordinate*** sources, square_color _number_of_colo
 	for(square_color i = 1; i < number_of_colors; i++)
 	{
 		coordinate** sourcesofcolor = sources[i];
-		firstnode = new Node(i + 1, sourcesofcolor[0][0], sourcesofcolor[0][1], firstnode, true); // x, y of starting source
+		firstnode = new Node(i + 1, sourcesofcolor[0][0], sourcesofcolor[0][1], firstnode, NULL, true); // x, y of starting source
 		endsources[i] = new coordinate[2];
 		// x, y of end source
 		endsources[i][0] = sourcesofcolor[1][0];
@@ -45,7 +47,8 @@ Tree::Tree(coordinate _size, coordinate*** sources, square_color _number_of_colo
 		
 	
 	newnodes = new Node*[number_of_colors * 4]();
-	printf("%p\n", newnodes);
+	
+	nodeeval = new NodeEval(&analysisgrid, sources, number_of_colors, size);
 	
 }
 
@@ -69,29 +72,27 @@ Tree::~Tree()
 
 void Tree::solve(int numberofsolutions)
 {
+	if(numberofsolutions < 0 || numberofsolutions >= MAX_NUMBER_OF_SOLVED_NODES)
+		numberofsolutions = MAX_NUMBER_OF_SOLVED_NODES - 1;
+	
 	Node * node;
 	while(1)
 	{
 		node = activenodes.popFirstNode();
 		if(node == NULL)
-		{
-			deleteGrid(analysisgrid, size);
-			analysisgrid = NULL;
-			printf("FINI\n");
 			break;
-		}
+		
 		else if(node->eval == EVAL_SOLVED)
 		{
 			solved_nodes[isolvednodes] = node;
 			isolvednodes++;
-			applynodetogrid(node, analysisgrid);
-			printGrid(analysisgrid, size);
+
 			if(isolvednodes == numberofsolutions) break;
-			
 		}
 
 		expandNode(node);
 	}
+	
 }
 
 bool Tree::generatemoves()
@@ -99,6 +100,11 @@ bool Tree::generatemoves()
 	bool isok = true;
 	coordinate endsource_x, endsource_y, tempsource_x, tempsource_y;
 	char count;
+	
+	for(square_color i = 0; i < number_of_colors; i++)
+		for(char j = 0; j < 4; j++)
+			moves[i][j][0] = moves[i][j][1] = -1;
+	
 	for(square_color i = 0; i < number_of_colors && isok; i++)
 	{
 		endsource_x = endsources[i][0];
@@ -108,7 +114,7 @@ bool Tree::generatemoves()
 		tempsource_y = tempsources[i]->y;
 		
 		if(tempsource_x != endsource_x || tempsource_y != endsource_y)
-		{
+		{			
 			analysisgrid[endsource_y][endsource_x] = 0; // Temporarily
 			generateMoves(moves[i], analysisgrid, size, tempsource_x, tempsource_y);
 			analysisgrid[endsource_y][endsource_x] = i + 1; 
@@ -133,12 +139,24 @@ bool Tree::generatemoves()
 				break;
 			}
 			
+			
 		}
 	}
 	
 	return isok;
 }
 
+void test(square_color ** grid, coordinate** endsources, coordinate size)
+{
+	for(int i = 0; i < size; i++) for(int j = 0; j < size; j++)
+	{
+		square_color couleur = grid[i][j];
+		if(couleur != 0)
+			assert(j == endsources[couleur - 1][0] && i == endsources[couleur - 1][1]);
+		
+	}
+}
+	
 
 void Tree::expandNode(Node * node)
 {
@@ -146,7 +164,6 @@ void Tree::expandNode(Node * node)
 	applynodetogrid(node, analysisgrid);
 	computetempsources(node, tempsources, number_of_colors);
 	
-	printf("%p\n", newnodes);
 	int iNewnodes = 0;
 	Node * basenode = node;
 	Node * newnode;
@@ -182,7 +199,7 @@ void Tree::expandNode(Node * node)
 					if(moves[i][j][0] == -1) 
 						continue;
 				
-					newnode = new Node(i + 1, moves[i][j][0], moves[i][j][1], basenode, isfirstchild, (node->depth + 2 == size * size));
+					newnode = new Node(i + 1, moves[i][j][0], moves[i][j][1], basenode, tempsource, isfirstchild, (moves[i][j][0] == endsourceofcolor_x && moves[i][j][1] == endsourceofcolor_y));
 					// Aimed at making sure that the move in question wasn't analyzed previously
 					analysisgrid[moves[i][j][1]][moves[i][j][0]] = i + 1;
 					tempsources[i] = newnode;
@@ -190,7 +207,6 @@ void Tree::expandNode(Node * node)
 					if(!transpositiontable->positionwasseenbefore(analysisgrid, tempsources))
 					{
 						transpositiontable->inputnode(newnode);
-						printf("%i\n", iNewnodes);
 						newnodes[iNewnodes] = newnode;
 						iNewnodes++;	
 						isfirstchild = false;
@@ -208,17 +224,22 @@ void Tree::expandNode(Node * node)
 				
 			}
 		}
-		for(square_color iEndsources = 0; iEndsources < number_of_colors; iEndsources++)
-			analysisgrid[endsources[iEndsources][1]][endsources[iEndsources][0]] = iEndsources + 1;
+		
 		
 		for(int i = 0; i < iNewnodes; i++)
+		{
+			newnodes[i]->eval = nodeeval->evaluateNode(newnodes[i]);
 			activenodes.insertnode(newnodes[i]);
+		}
 		
 	}
 	
+	
 	resetgrid(node, analysisgrid);
+	for(square_color iEndsources = 0; iEndsources < number_of_colors; iEndsources++)
+		analysisgrid[endsources[iEndsources][1]][endsources[iEndsources][0]] = iEndsources + 1;
 
 }
 	
-	
+
 

@@ -42,15 +42,16 @@ int main()
 	std::cout << foo.inputnode(foobaz, grid, tempsources) << std::endl;
 	resetgrid(foobaz, grid);
 	*/
-	clock_t t1 = clock();
 	Tree foobar = Tree(5, sources, 2);
+	clock_t t1 = clock();
+
 
 	
 
 	foobar.solve(1);
 	
 	clock_t t2 = clock();
-	printf("Temps: %d\n", (t2-t1)/CLOCKS_PER_SEC);
+	printf("Temps: %f\n", (double)(t2-t1)/CLOCKS_PER_SEC);
 
 
 
