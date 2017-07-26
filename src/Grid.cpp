@@ -123,3 +123,13 @@ void deleteGrid(square_color** grid, coordinate size)
 	for(int i = 0; i < size; i++) delete[] grid[i];
 	delete[] grid;
 }
+
+void printGrid(square_color** grid, coordinate size)
+{
+	for(int i = 0; i < size; i++)
+	{
+		for(int j = 0; j < size; j++)
+			printf("%i ", grid[i][j]);
+		printf("\n");
+	}
+}

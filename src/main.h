@@ -3,6 +3,7 @@
 #include "square.h"
 #include "UnsolvedGrid.h"
 #include "SolvedGrid.h"
+#include "Tree.h"
 int main();
 
 #endif

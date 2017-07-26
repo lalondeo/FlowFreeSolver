@@ -34,4 +34,5 @@ protected:
 
 square_color** generateEmptyGrid(coordinate _size);
 void deleteGrid(square_color** grid, coordinate size);
+void printGrid(square_color** grid, coordinate size);
 #endif

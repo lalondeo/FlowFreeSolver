@@ -2,6 +2,7 @@
 #define __SRC_SQUARE
 typedef char square_color; // 0 => Empty square, 1 => First color, ...
 typedef char coordinate; // Location in cartesian coordinates of the square in the grid
+typedef short int coordinate_squared; // For area-related calculations
 #include "stdio.h"
 
 class Square 
