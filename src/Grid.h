@@ -11,13 +11,14 @@
 #define LOGGING
 #define LOGFILEPATH "grids.txt"
 
-struct GridGeneralInfo
+
+
+struct GridInfo
 {
 	coordinate size;
 	square_color number_of_colors;
+	coordinate *** sources;
 };
-
-
 
 using namespace std;
 
