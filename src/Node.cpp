@@ -1,30 +1,51 @@
 #include "Node.h"
 #include <assert.h>
 
-Node::Node(square_color _color, coordinate _x, coordinate _y, Node * _predecessor, Node * _lastnodeinpipe, bool _isfirstchild, bool _isendsource) : 
-			color(_color), x(_x), y(_y), predecessor(_predecessor), lastnodeinpipe(_lastnodeinpipe), isfirstchild(_isfirstchild), isendsource(_isendsource)
+int blah = 0;
+int bluh = 0;
+
+Node::Node(square_color _color, coordinate _x, coordinate _y, Node * _predecessor, Node * _lastnodeinpipe, bool _isfirstchild) : 
+			color(_color), x(_x), y(_y), predecessor(_predecessor), lastnodeinpipe(_lastnodeinpipe), isfirstchild(_isfirstchild)
 {
 	assert(color > 0);
 	eval = 0;
-
-	
 	pipelength = ((lastnodeinpipe != NULL) ? lastnodeinpipe->pipelength + 1 : 0);
 	depth = ((predecessor != NULL) ? predecessor->depth + 1 : 0);
 
-		
+	#ifdef TREEANALYSIS
+	span = 0;
+	weightofbranch = 0;
+	successor = NULL;
+	rightsibling = NULL;
+	solves = false;
+	#endif
 }
 
 Node::~Node()
 {
+	/* if TREEANALYSIS is defined, the tree will not delete all nodes, but rather return the head node. The nodes will therefore be deleted
+		by deleting the head node. */
+	#ifdef TREEANALYSIS
+	Node * child = successor;
+	Node * temp;
+	while(child != NULL)
+	{
+		temp = child->rightsibling;
+		delete child;
+		child = temp;
+	}
+	
+	#else
+	/* If not, the tree will delete every final node. */
 	if(isfirstchild)
-		delete predecessor;
+		delete predecessor;	
+	#endif
 }
 
 
 void computetempsources(Node * node, Node* * tempsources, square_color number_of_colors)
 {	
-
-	for(square_color i = 0; i < number_of_colors; i++)
+	for(int i = 0; i < number_of_colors; i++)
 		tempsources[i] = NULL;
 	
 	square_color n = 0;

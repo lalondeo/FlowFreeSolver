@@ -4,32 +4,45 @@
 #include <cstdlib>
 #include <algorithm>
 
-#define EVAL_SOLVED 1000000000
-#define EVAL_NORMALMAX 999999999
+
+//#define TREEANALYSIS
+#pragma once
+
+
 using namespace std;
 
 class Node
 {
 public:
-	Node(square_color _color, coordinate _x, coordinate _y, Node* _predecessor, Node* _lastnodeinpipe, bool _isfirstchild = false, bool _isendsource = false);
+	Node(square_color _color, coordinate _x, coordinate _y, Node* _predecessor, Node* _lastnodeinpipe, bool _isfirstchild = false);
 	~Node();
 	
 	square_color getColor();
 	
 	square_color color;
-	coordinate x;
-	coordinate y;
-	bool isfirstchild;
-	bool isendsource;
+	const coordinate x;
+	const coordinate y;
 	
 	int eval;
 	coordinate_squared depth;
 	coordinate_squared pipelength;
-	//coordinate_squared distance_to_target;
 	
+	bool isfirstchild;
 	
 	Node * predecessor;
 	Node * lastnodeinpipe;
+
+	#ifdef TREEANALYSIS
+	Node * successor;
+	Node * rightsibling;
+	
+	int positionblueprint;
+	
+	int span;
+	int weightofbranch;
+	bool solves;
+	#endif
+	
 	
 	
 };

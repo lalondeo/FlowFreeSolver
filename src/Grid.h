@@ -2,6 +2,22 @@
 #define __SRC_GRID
 #include "square.h"
 #include <iostream>
+#include <fstream>
+#include "assert.h"
+#include <string>
+#include <cctype>
+#include <algorithm>
+
+#define LOGGING
+#define LOGFILEPATH "grids.txt"
+
+struct GridGeneralInfo
+{
+	coordinate size;
+	square_color number_of_colors;
+};
+
+
 
 using namespace std;
 
@@ -35,4 +51,13 @@ protected:
 square_color** generateEmptyGrid(coordinate _size);
 void deleteGrid(square_color** grid, coordinate size);
 void printGrid(square_color** grid, coordinate size);
+uint64_t reducegrid(square_color ** grid, coordinate size);
+GridInfo * readfen(string fen);
+
+#ifdef LOGGING
+void logGrid(square_color** grid, coordinate size);
+void openlogfile();
+void closelogfile();
+#endif
+
 #endif

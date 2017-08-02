@@ -1,9 +1,21 @@
 #ifndef __SRC_SQUARE
 #define __SRC_SQUARE
-typedef char square_color; // 0 => Empty square, 1 => First color, ...
+/*
+	Used to represent the color of a square. 0 represents an empty square and colors start by 1 up to (theoretically) infinity.
+	In case you want to change the type, please make sure that it can handle negative numbers and number_of_color + 1, as these are used in the 
+	move generator.
+
+*/
+typedef char square_color;
 typedef char coordinate; // Location in cartesian coordinates of the square in the grid
 typedef short int coordinate_squared; // For area-related calculations
 #include "stdio.h"
+
+inline int coordinatetonumber(coordinate x, coordinate y, coordinate size) 
+{
+	return (x*size + y);
+}
+
 
 class Square 
 {

@@ -2,58 +2,52 @@
 #include <ctime>
 #include <inttypes.h>
 #include <stdio.h>
+#include "treeanalysis.h"
+#include <fstream>
+#include <cstdlib>
 
 #define __STDC_FORMAT_MACROS
 #include "transpositiontable.h"
 int main()
 {
-	coordinate*** sources = new coordinate**[2];
-	for(int i = 0; i < 2; i++)
-	{
-		sources[i] = new coordinate*[2];
+	#ifdef LOGGING
+	openlogfile();
+	#endif
+	
+	// 5x5: 1---2/--3--/---2-/-4-3-/-1--4
+	// 6x6: ------/------/---1--/-213--/453-2-/5-4---
+	// 7x7: -------/-1---2-/--2--34/------5/-----67/5413---/-----67
+	// 8x8: 1---2---/3----454/1-3--5-6/7----87-/--89----/--9-2--/--------/-------6
+	// 9x9: --1------/-2345----/---67----/---------/---28--5-/-------74/--3-----1/------86-/---------
+	// 14x14: ----------1--1/--------------/--2345--------/----------67--/------45--8---/------6---9---/--------------/--8A-------7--/--------B-BC--/-3-------D----/-F---F-A--D---/---------9C---/--E----E------/2-------------
+	GridInfo * info = readfen("");
+	square_color ** foo = generateEmptyGrid(info->size);
+	for(int i = 0; i < info->number_of_colors; i++)
 		for(int j = 0; j < 2; j++)
-			sources[i][j] = new coordinate[2];
-	}
-	sources[0][0][0] = 0;
-	sources[0][0][1] = 0;
-	sources[0][1][0] = 0;
-	sources[0][1][1] = 4;
-	sources[1][0][0] = 1;
-	sources[1][0][1] = 0;
-	sources[1][1][0] = 4;
-	sources[1][1][1] = 4;
+			foo[info->sources[i][j][1]][info->sources[i][j][0]] = i + 1;
+	
+	printGrid(foo, info->size);
+	deleteGrid(foo, info->size);
+	printf("---\n");
 
 	
-
-
-	/*
-	TranspositionTable foo = TranspositionTable(1e08, 7, 2);
-	Node * foobar = new Node(1, 0, 0, new Node(2, 4, 3, NULL, false, false), false, false);
-	Node * foobaz = new Node(2, 3, 3, new Node(1, 0, 0, NULL, false, false), false, false);
-	square_color ** grid = generateEmptyGrid(7);
-	Node* * tempsources = generatetempsources(2);
-	applynodetogrid(foobar, grid);
-	computetempsources(foobar, tempsources, 2);
-	foo.inputnode(foobar, grid, tempsources);
-	resetgrid(foobar, grid);
-	
-	applynodetogrid(foobaz, grid);
-	computetempsources(foobaz, tempsources, 2);
-	std::cout << foo.inputnode(foobaz, grid, tempsources) << std::endl;
-	resetgrid(foobaz, grid);
-	*/
-	Tree foobar = Tree(5, sources, 2);
+	Tree * tree = new Tree(info->size, info->sources, info->number_of_colors);
 	clock_t t1 = clock();
-
-
 	
+	tree->solve(1);
+	Node * node = tree->getfirstnode();
+	//createblueprints(node, 5);
+	//createspans(node, 5);
+	//printf("%i\n", node->weightofbranch);
+	//foobaz(node);
+	//moo();
 
-	foobar.solve(1);
-	
+
 	clock_t t2 = clock();
-	printf("Temps: %f\n", (double)(t2-t1)/CLOCKS_PER_SEC);
-
-
-
-
+	delete tree;
+	printf("%f sec\n", (double)(t2-t1)/CLOCKS_PER_SEC);
+	
+	#ifdef LOGGING
+	closelogfile();
+	#endif
 }
